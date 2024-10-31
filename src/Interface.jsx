@@ -5,6 +5,7 @@ function Interface() {
   const start = useGameStore((state) => state.start);
   const score = useGameStore((state) => state.score);
   const validating = useGameStore((state) => state.validating);
+  const restart = useGameStore((state) => state.restart);
 
   const handleStart = () => {
     start();
@@ -12,6 +13,10 @@ function Interface() {
 
   const handleCheckResult = () => {
     validating();
+  };
+
+  const handleRestart = () => {
+    restart();
   };
 
   return (
@@ -27,9 +32,18 @@ function Interface() {
       {mode !== "ready" && (
         <div
           onClick={handleCheckResult}
-          className="fixed flex justify-center top-0 left-0 size-full"
+          className="fixed flex justify-center top-0 left-0 size-full "
         >
           <div className="absolute top-10 text-9xl text-white ">{score}</div>
+        </div>
+      )}
+      {mode === "ended" && (
+        <div
+          onClick={handleRestart}
+          className="fixed flex justify-center top-0 left-0 size-full "
+        >
+          <div className="absolute top-10 text-9xl text-white ">{score}</div>
+          <div className="">Reiniciar</div>
         </div>
       )}
     </>

@@ -1,8 +1,9 @@
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import { useGameStore } from "./store/useGame.js";
 import { InstancedRigidBodies } from "@react-three/rapier";
+import adjustBox from "./utils/adjustBox.js";
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
@@ -41,8 +42,6 @@ function BlocksTower(props) {
   //   }
   // }, [blocks]);
 
-  console.log(blocks);
-
   return (
     <>
       {/* {blocks &&
@@ -59,8 +58,8 @@ function BlocksTower(props) {
           key={i}
           geometry={boxGeometry}
           castShadow
-          {...props}
-          position={block.position} // Esto debe ser un array [x, y, z]
+          position={block.position}
+          scale={block.scale}
         >
           <meshStandardMaterial color={block.color} />
         </mesh>
@@ -71,6 +70,7 @@ function BlocksTower(props) {
 
 function MovingBlock(props) {
   const block = useRef();
+
   const blocks = useGameStore((state) => state.blocks);
   const setBlocks = useGameStore((state) => state.setBlocks);
 
@@ -79,31 +79,54 @@ function MovingBlock(props) {
   const color = useGameStore((state) => state.color);
   const mode = useGameStore((state) => state.mode);
   const continuePlaying = useGameStore((state) => state.continuePlaying);
+  const end = useGameStore((state) => state.end);
 
-  useFrame((state) => {
+  /**
+   * Movement
+   */
+  const { clock } = useThree();
+
+  useFrame((state, delta) => {
     if (mode === "playing") {
-      const time = state.clock.elapsedTime;
-      block.current.position.x = Math.sin(time * speed) * 6;
-    } else if (mode === "validating") {
-      // block.current.position.y -= 0.3;
-      const coordinates = [
-        block.current.position.x,
-        block.current.position.y,
-        block.current.position.z,
-      ];
+      const elapsedTime = state.clock.elapsedTime;
 
-      const newBlock = {
-        key: "instance_" + (score + 1),
-        position: coordinates,
-        color: new THREE.Color(`hsl(${(score - 1) * 8 + color}, 60%, 50%)`),
-      };
+      if (score % 2 === 0) {
+        block.current.position.x = Math.sin(elapsedTime * speed) * 6;
+      } else {
+        block.current.position.z = Math.sin(elapsedTime * speed) * 6;
+      }
+    }
 
-      console.log(newBlock);
-
-      setBlocks([...blocks, newBlock]);
-      continuePlaying();
+    if (mode === "ended") {
+      block.current.position.y -= delta * 15;
     }
   });
+
+  useEffect(() => {
+    if (mode === "validating") {
+      const lastBlock = blocks[blocks.length - 1];
+      const currentBlock = block.current;
+
+      if (score % 2 === 0) {
+        const newBlock = adjustBox(currentBlock, lastBlock, "x", score, color);
+
+        if (!newBlock) return end();
+
+        setBlocks([...blocks, newBlock]);
+      } else {
+        const newBlock = adjustBox(currentBlock, lastBlock, "z", score, color);
+
+        if (!newBlock) return end();
+
+        setBlocks([...blocks, newBlock]);
+      }
+
+      continuePlaying();
+    }
+
+    // Restart clock to 0 to change block position to default
+    clock.elapsedTime = 4.8;
+  }, [mode]);
 
   return (
     <mesh ref={block} geometry={boxGeometry} {...props}>
@@ -115,17 +138,48 @@ function MovingBlock(props) {
 }
 
 export default function Level() {
-  const [actualScale, setActualScale] = useState([4, 0.5, 4]);
-
+  const blocks = useGameStore((state) => state.blocks);
   const score = useGameStore((state) => state.score);
-  const setScore = useGameStore((state) => state.setScore);
   const mode = useGameStore((state) => state.mode);
+
+  /**
+   * Resize scale
+   */
+
+  const scale = blocks[blocks.length - 1].scale;
+  const position = blocks[blocks.length - 1].position;
+
+  /**
+   * Camera
+   */
+  const { camera } = useThree();
+
+  useEffect(() => {
+    camera.position.set(7, 8, 7);
+  }, [camera]);
+
+  const smoothedCameraYRef = useRef(8);
+  useFrame(() => {
+    const targetCameraY = 8 + score * 0.5;
+
+    // Manual lerp, start to end with 0.1 intervals
+    smoothedCameraYRef.current = THREE.MathUtils.lerp(
+      smoothedCameraYRef.current,
+      targetCameraY,
+      0.1
+    );
+
+    camera.position.y = smoothedCameraYRef.current;
+  });
 
   return (
     <>
-      <BlocksTower scale={actualScale} />
-      {(mode === "playing" || mode === "validating") && (
-        <MovingBlock position={[0, (score + 1) * 0.5, 0]} scale={actualScale} />
+      <BlocksTower />
+      {(mode === "playing" || mode === "validating" || mode === "ended") && (
+        <MovingBlock
+          position={[position[0], (score + 1) * 0.5, position[2]]}
+          scale={scale}
+        />
       )}
     </>
   );

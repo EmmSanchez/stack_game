@@ -2,6 +2,11 @@ import { create } from "zustand";
 
 const INITAL_SPEED = 1;
 const INITAL_SCORE = 0;
+const INITIAL_BLOCK = {
+  position: [0, 0, 0],
+  color: "#000",
+  scale: [4, 0.5, 4],
+};
 const RANDOM_COLOR = Math.random() * 100;
 const MODES = {
   READY: "ready",
@@ -18,12 +23,7 @@ export const useGameStore = create((set) => {
     setColor: (value) => {
       set({ color: value });
     },
-    blocks: [
-      {
-        position: [0, 0, 0],
-        color: "#000",
-      },
-    ],
+    blocks: [INITIAL_BLOCK],
     setBlocks: (value) => {
       set({ blocks: value });
     },
@@ -65,13 +65,17 @@ export const useGameStore = create((set) => {
     restart: () => {
       set((state) => {
         if (state.mode === "playing" || state.mode === "ended") {
-          return {};
+          return {
+            blocks: [INITIAL_BLOCK],
+            mode: "playing",
+            score: INITAL_SCORE,
+          };
         }
       });
     },
     end: () => {
       set((state) => {
-        if (state.mode === MODES.PLAYING) {
+        if (state.mode === MODES.VALIDATING) {
           return { mode: MODES.ENDED };
         } else {
           return {};
