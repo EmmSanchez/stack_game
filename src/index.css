@@ -14,3 +14,19 @@ body,
   font-family: "Quicksand", sans-serif;
   font-weight: 300;
 }
+
+body {
+  @apply bg-gradient-to-b from-blue-500 to-purple-600;
+}
+
+.custom-mask {
+  -webkit-mask-image: linear-gradient(#000, rgba(0, 0, 0, 0));
+  mask-image: linear-gradient(#000, rgba(0, 0, 0, 0));
+}
+.shadow-inset {
+  background: radial-gradient(
+    circle at 60% center,
+    rgba(0, 0, 0, 0) 20%,
+    rgba(0, 0, 0, 0.7) 150%
+  );
+}

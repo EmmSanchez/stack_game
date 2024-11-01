@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { useGameStore } from "./store/useGame.js";
 import { InstancedRigidBodies } from "@react-three/rapier";
 import adjustBox from "./utils/adjustBox.js";
+import createResuideBlock from "./utils/createResuideBlock.js";
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
@@ -58,6 +59,7 @@ function BlocksTower(props) {
           key={i}
           geometry={boxGeometry}
           castShadow
+          receiveShadow
           position={block.position}
           scale={block.scale}
         >
@@ -88,6 +90,9 @@ function MovingBlock(props) {
 
   useFrame((state, delta) => {
     if (mode === "playing") {
+      // To fix when is ended in 0 and restart
+      block.current.position.y = (score + 1) * 0.5;
+
       const elapsedTime = state.clock.elapsedTime;
 
       if (score % 2 === 0) {
@@ -109,12 +114,26 @@ function MovingBlock(props) {
 
       if (score % 2 === 0) {
         const newBlock = adjustBox(currentBlock, lastBlock, "x", score, color);
+        const newResidualBlock = createResuideBlock(
+          currentBlock,
+          lastBlock,
+          "x",
+          score,
+          color
+        );
 
         if (!newBlock) return end();
 
         setBlocks([...blocks, newBlock]);
       } else {
         const newBlock = adjustBox(currentBlock, lastBlock, "z", score, color);
+        const newResidualBlock = createResuideBlock(
+          currentBlock,
+          lastBlock,
+          "z",
+          score,
+          color
+        );
 
         if (!newBlock) return end();
 
@@ -129,10 +148,21 @@ function MovingBlock(props) {
   }, [mode]);
 
   return (
-    <mesh ref={block} geometry={boxGeometry} {...props}>
-      <meshStandardMaterial
-        color={`hsl(${(score - 1) * 8 + color}, 60%, 50%)`}
-      />
+    <>
+      <mesh ref={block} geometry={boxGeometry} castShadow {...props}>
+        <meshStandardMaterial
+          color={`hsl(${(score - 1) * 14 + color}, 60%, 50%)`}
+        />
+      </mesh>
+      <ResidualBlock />
+    </>
+  );
+}
+
+function ResidualBlock(props) {
+  return (
+    <mesh geometry={boxGeometry} {...props}>
+      <meshStandardMaterial />
     </mesh>
   );
 }

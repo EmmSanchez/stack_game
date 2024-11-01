@@ -7,8 +7,7 @@ import { Perf } from "r3f-perf";
 export default function Experience() {
   return (
     <>
-      <Perf position="top-left" />
-      <color args={["#333"]} attach="background"></color>
+      {/* <Perf position="top-left" /> */}
 
       <Physics debug>
         <Lights />

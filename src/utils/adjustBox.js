@@ -19,13 +19,10 @@ export default function adjustBox(currentBlock, lastBlock, axis, score, color) {
   const newScale = [...currentBlock.scale];
   newScale[axisIndex] -= Math.abs(difference);
 
-  console.log(newPosition);
-  console.log(newScale);
-
   return {
     key: "instance_" + (score + 1),
     position: newPosition,
     scale: newScale,
-    color: new THREE.Color(`hsl(${(score - 1) * 8 + color}, 60%, 50%)`),
+    color: new THREE.Color(`hsl(${(score - 1) * 14 + color}, 60%, 50%)`),
   };
 }
