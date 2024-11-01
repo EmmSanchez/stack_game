@@ -27,6 +27,10 @@ export const useGameStore = create((set) => {
     setBlocks: (value) => {
       set({ blocks: value });
     },
+    residual: [],
+    setResidual: (value) => {
+      set({ residual: value });
+    },
     mode: MODES.READY,
     setScore: (value) => {
       set({ score: value });
@@ -65,6 +69,7 @@ export const useGameStore = create((set) => {
             blocks: [INITIAL_BLOCK],
             mode: MODES.PLAYING,
             score: INITAL_SCORE,
+            residual: [],
           };
         }
       });

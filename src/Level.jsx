@@ -2,9 +2,9 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import { useGameStore } from "./store/useGame.js";
-import { InstancedRigidBodies } from "@react-three/rapier";
+import { InstancedRigidBodies, RigidBody } from "@react-three/rapier";
 import adjustBox from "./utils/adjustBox.js";
-import createResuideBlock from "./utils/createResuideBlock.js";
+import createResidueBlock from "./utils/createResidueBlock.js";
 
 const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
@@ -55,16 +55,17 @@ function BlocksTower(props) {
         })} */}
 
       {blocks.map((block, i) => (
-        <mesh
-          key={i}
-          geometry={boxGeometry}
-          castShadow
-          receiveShadow
-          position={block.position}
-          scale={block.scale}
-        >
-          <meshStandardMaterial color={block.color} />
-        </mesh>
+        <RigidBody key={i} type="fixed">
+          <mesh
+            geometry={boxGeometry}
+            castShadow
+            receiveShadow
+            position={block.position}
+            scale={block.scale}
+          >
+            <meshStandardMaterial color={block.color} />
+          </mesh>
+        </RigidBody>
       ))}
     </>
   );
@@ -75,6 +76,8 @@ function MovingBlock(props) {
 
   const blocks = useGameStore((state) => state.blocks);
   const setBlocks = useGameStore((state) => state.setBlocks);
+  const residual = useGameStore((state) => state.residual);
+  const setResidual = useGameStore((state) => state.setResidual);
 
   const score = useGameStore((state) => state.score);
   const speed = useGameStore((state) => state.speed);
@@ -113,29 +116,45 @@ function MovingBlock(props) {
       const currentBlock = block.current;
 
       if (score % 2 === 0) {
-        const newBlock = adjustBox(currentBlock, lastBlock, "x", score, color);
-        const newResidualBlock = createResuideBlock(
+        const { newBlock, meta } = adjustBox(
           currentBlock,
           lastBlock,
           "x",
           score,
           color
         );
-
         if (!newBlock) return end();
+
+        const newResidualBlock = createResidueBlock(
+          currentBlock,
+          newBlock,
+          meta.difference,
+          "x",
+          score,
+          color
+        );
+        setResidual([...residual, newResidualBlock]);
 
         setBlocks([...blocks, newBlock]);
       } else {
-        const newBlock = adjustBox(currentBlock, lastBlock, "z", score, color);
-        const newResidualBlock = createResuideBlock(
+        const { newBlock, meta } = adjustBox(
           currentBlock,
           lastBlock,
           "z",
           score,
           color
         );
-
         if (!newBlock) return end();
+
+        const newResidualBlock = createResidueBlock(
+          currentBlock,
+          newBlock,
+          meta.difference,
+          "z",
+          score,
+          color
+        );
+        setResidual([...residual, newResidualBlock]);
 
         setBlocks([...blocks, newBlock]);
       }
@@ -154,16 +173,21 @@ function MovingBlock(props) {
           color={`hsl(${(score - 1) * 14 + color}, 60%, 50%)`}
         />
       </mesh>
-      <ResidualBlock />
+      {residual &&
+        residual.map((item, index) => {
+          return <ResidualBlock key={index} {...item} />;
+        })}
     </>
   );
 }
 
 function ResidualBlock(props) {
   return (
-    <mesh geometry={boxGeometry} {...props}>
-      <meshStandardMaterial />
-    </mesh>
+    <RigidBody>
+      <mesh castShadow geometry={boxGeometry} {...props}>
+        <meshStandardMaterial color={props.color} />
+      </mesh>
+    </RigidBody>
   );
 }
 

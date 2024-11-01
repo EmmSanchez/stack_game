@@ -10,7 +10,7 @@ export default function adjustBox(currentBlock, lastBlock, axis, score, color) {
     (lastBlock.scale[axisIndex] + currentBlock.scale[axis]) / 2;
 
   if (Math.abs(difference) > halfCombinedWith) {
-    return null;
+    return {};
   }
 
   const newPosition = [...currentBlock.position];
@@ -20,9 +20,14 @@ export default function adjustBox(currentBlock, lastBlock, axis, score, color) {
   newScale[axisIndex] -= Math.abs(difference);
 
   return {
-    key: "instance_" + (score + 1),
-    position: newPosition,
-    scale: newScale,
-    color: new THREE.Color(`hsl(${(score - 1) * 14 + color}, 60%, 50%)`),
+    newBlock: {
+      key: "instance_" + (score + 1),
+      position: newPosition,
+      scale: newScale,
+      color: new THREE.Color(`hsl(${(score - 1) * 14 + color}, 60%, 50%)`),
+    },
+    meta: {
+      difference: difference,
+    },
   };
 }
