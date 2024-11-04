@@ -16,7 +16,8 @@ body,
 }
 
 body {
-  @apply bg-gradient-to-b from-blue-500 to-purple-600;
+  @apply bg-gradient-to-b from-[#183D3D] to-[#02475E];
+  /* @apply bg-[#010101]; */
 }
 
 .custom-mask {
