@@ -9,6 +9,7 @@ export default function createResidueBlock(
 ) {
   // currentBlock properties are objects, newBlock's ones are arrays
   if (!newBlock) return null;
+  if (difference === 0) return null;
   const axisIndex = axis === "x" ? 0 : 2;
 
   const newScale = [...currentBlock.scale];

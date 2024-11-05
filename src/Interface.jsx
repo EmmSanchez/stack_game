@@ -1,6 +1,16 @@
 import { useGameStore } from "./store/useGame";
 import data from "./fakeData.json";
 import { useState } from "react";
+import {
+  ChartIcon,
+  HomeIcon,
+  Restart,
+  ShareIcon,
+  TelegramIcon,
+  UserIcon,
+  WalletIcon,
+  XIcon,
+} from "./assets/icons/interfaceIcons";
 
 function Interface() {
   const mode = useGameStore((state) => state.mode);
@@ -8,6 +18,7 @@ function Interface() {
   const score = useGameStore((state) => state.score);
   const validating = useGameStore((state) => state.validating);
   const restart = useGameStore((state) => state.restart);
+  const home = useGameStore((state) => state.home);
 
   const [users, setUsers] = useState(data);
 
@@ -23,28 +34,64 @@ function Interface() {
     restart();
   };
 
+  const handleGoToHome = () => {
+    home();
+  };
+
   return (
     <>
       {mode === "ready" && (
         <div
           onClick={handleStart}
-          className="fixed flex justify-center top-0 left-0 size-full hover:cursor-pointer"
+          className="fixed flex justify-center text-center top-0 left-0 size-full hover:cursor-pointer"
         >
-          <div className="absolute top-10 text-9xl text-white font-bold">
-            Start
+          <div className="absolute top-[5%] text-[8vw] text-white font-bold">
+            <p>Stack Game</p>
+            <p className="text-[2vw] font-medium">Touch to Start</p>
+          </div>
+
+          <div className="absolute bottom-[4%] flex flex-col justify-center items-center gap-[1.6vw] text-white">
+            <div className="flex gap-[1vw]">
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="flex gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
+              >
+                <p>Connect Wallet</p>
+                <WalletIcon />
+              </button>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="flex gap-[.8vw] hover:bg-[#2A3540]/80 px-[1vw] py-[.6vw] rounded-[.6vw]"
+              >
+                <p>Leaderboard</p>
+                <ChartIcon />
+              </button>
+            </div>
+            <div className="flex gap-[1vw] text-gray-200">
+              <XIcon
+                onClick={(e) => e.stopPropagation()}
+                className="size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer"
+              />
+              <TelegramIcon
+                onClick={(e) => e.stopPropagation()}
+                className="size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer"
+              />
+            </div>
           </div>
         </div>
       )}
+
       {mode !== "ready" && (
         <div
           onClick={handleCheckResult}
           className="fixed flex justify-center top-0 left-0 size-full hover:cursor-pointer"
         >
           <div className="absolute top-[2%] text-[8vw] text-white font-bold">
-            {score}
+            <p>{score}</p>
           </div>
         </div>
       )}
+
       {mode === "ended" && (
         <div className="fixed flex justify-center items-start top-0 left-0 size-full">
           {/* Ranking */}
@@ -105,30 +152,58 @@ function Interface() {
             </div>
           </div>
 
-          <div
-            onClick={handleRestart}
-            className="absolute top-[22%] text-[3vw] text-white font-semibold hover:cursor-pointer size-fit"
-          >
-            Restart
-          </div>
-
-          {/* <div className="absolute flex flex-col gap-[.4vw] top-[5%] right-[5%] w-[25%] h-[90%]">
-            <div className="relative bg-[#040D12] w-full h-[20%] rounded-[1vw] overflow-hidden">
-              <div className="absolute top-0 size-full rounded-t-xl shadow-inset">
-                <div className="relative">
-                  <h2 className="absolute top-[3vh] left-[3%] text-[2.6vw] max-w-[2vw] text-white font-bold leading-[2.8vw]">
-                    HIGHEST SCORE
-                  </h2>
-                  <h2 className="absolute -top-[.2vw] right-[8%] text-[6vw] text-white font-bold">
-                    {score}
-                  </h2>
-                </div>
+          <div className="absolute flex flex-col items-center gap-[1vw] top-[5%] right-[5%] w-[25%] h-[90%]">
+            <div className="w-full h-[8%] flex justify-between items-center text-[#3DD2B4]">
+              <div className="flex gap-[.6vw] justify-center items-center font-semibold">
+                <UserIcon className="size-[1.4vw]" />
+                cosmic_ray
+              </div>
+              <div className="flex items-center gap-[.2vw]">
+                <HomeIcon
+                  onClick={handleGoToHome}
+                  className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out"
+                />
+                <WalletIcon className="size-[3vw] hover:bg-[#040D12] p-[.8vw] rounded-[.4vw] hover:cursor-pointer transition ease-in-out" />
               </div>
             </div>
-            <div className="bg-[#040D12] flex items-center w-full h-[10%] px-[2vw] font-semibold rounded-[1vw] text-white text-[1.2vw]">
-              <p>You’re in the Top 5% of players!</p>
+
+            <div className="relative flex flex-col justify-center items-center bg-[#040D12] w-full h-[20%] rounded-[1vw] overflow-hidden">
+              <p className="text-[4vw] font-extrabold leading-[4vw] text-[#3DD2B4]">
+                60
+              </p>
+              <p className="text-[1.5vw] font-medium text-gray-400">
+                Highest Score
+              </p>
             </div>
-          </div> */}
+
+            <div className="flex w-full h-[8%] font-semibold text-[#040D12]">
+              <button
+                onClick={handleRestart}
+                className="flex items-center justify-center gap-[.8vw] text-[1.2vw] w-full bg-[#3DD2B4] hover:bg-[#36b39a] px-[2vw] rounded-[1vw] transition ease-in-out"
+              >
+                <Restart className="rotate-180 size-[1.4vw]" />
+                Restart
+              </button>
+            </div>
+
+            <div className="relative top-[38%] left-0 flex flex-col justify-center items-center w-full h-[20%] gap-[1vw] font-semibold">
+              {/* <button
+                onClick={handleShareScore}
+                className="flex items-center justify-center gap-[.8vw] text-[1.2vw] w-full h-[35%] hover:bg-[#040D12]/20 px-[2vw] rounded-[1vw] transition ease-in-out text-[#3DD2B4]"
+              >
+                <ShareIcon className="rotate-180 size-[1.4vw]" />
+                Share Score
+              </button> */}
+              <div className="text-white">
+                <p>Logo</p>
+              </div>
+
+              <div className="flex gap-[1vw] text-gray-200">
+                <XIcon className="size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer" />
+                <TelegramIcon className="size-[1.8vw] transition hover:text-[#3DD2B4] hover:cursor-pointer" />
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </>

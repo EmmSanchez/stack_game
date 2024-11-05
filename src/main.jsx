@@ -8,7 +8,7 @@ createRoot(document.getElementById("root")).render(
   <>
     <Canvas
       shadows
-      camera={{ fov: 50, near: 0.1, far: 200, position: [7, 8, 7] }}
+      camera={{ fov: 50, near: 0.1, far: 200, position: [7, 7, 7] }}
     >
       <Experience />
     </Canvas>

@@ -4,7 +4,7 @@ const INITAL_SPEED = 1;
 const INITAL_SCORE = 0;
 const INITIAL_BLOCK = {
   position: [0, 0, 0],
-  color: "#fff333",
+  color: "#333fff",
   scale: [4, 0.5, 4],
 };
 const RANDOM_COLOR = Math.random() * 100;
@@ -67,7 +67,21 @@ export const useGameStore = create((set) => {
         if (state.mode === "playing" || state.mode === "ended") {
           return {
             blocks: [INITIAL_BLOCK],
+            speed: INITAL_SPEED,
             mode: MODES.PLAYING,
+            score: INITAL_SCORE,
+            residual: [],
+          };
+        }
+      });
+    },
+    home: () => {
+      set((state) => {
+        if (state.mode === "ended") {
+          return {
+            blocks: [INITIAL_BLOCK],
+            speed: INITAL_SPEED,
+            mode: MODES.READY,
             score: INITAL_SCORE,
             residual: [],
           };

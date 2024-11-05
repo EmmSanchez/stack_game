@@ -104,10 +104,6 @@ function MovingBlock(props) {
         block.current.position.z = Math.sin(elapsedTime * speed) * 6;
       }
     }
-
-    if (mode === "ended") {
-      block.current.position.y -= delta * 15;
-    }
   });
 
   useEffect(() => {
@@ -123,7 +119,17 @@ function MovingBlock(props) {
           score,
           color
         );
-        if (!newBlock) return end();
+
+        if (!newBlock) {
+          const finalBlock = {
+            position: currentBlock.position,
+            scale: currentBlock.scale,
+            color: currentBlock.material.color,
+          };
+
+          setResidual([...residual, finalBlock]);
+          return end();
+        }
 
         const newResidualBlock = createResidueBlock(
           currentBlock,
@@ -144,7 +150,17 @@ function MovingBlock(props) {
           score,
           color
         );
-        if (!newBlock) return end();
+
+        if (!newBlock) {
+          const finalBlock = {
+            position: currentBlock.position,
+            scale: currentBlock.scale,
+            color: currentBlock.material.color,
+          };
+
+          setResidual([...residual, finalBlock]);
+          return end();
+        }
 
         const newResidualBlock = createResidueBlock(
           currentBlock,
@@ -173,10 +189,6 @@ function MovingBlock(props) {
           color={`hsl(${(score - 1) * 14 + color}, 60%, 50%)`}
         />
       </mesh>
-      {residual &&
-        residual.map((item, index) => {
-          return <ResidualBlock key={index} {...item} />;
-        })}
     </>
   );
 }
@@ -195,11 +207,12 @@ export default function Level() {
   const blocks = useGameStore((state) => state.blocks);
   const score = useGameStore((state) => state.score);
   const mode = useGameStore((state) => state.mode);
+  const residual = useGameStore((state) => state.residual);
+  const setColor = useGameStore((state) => state.setColor);
 
   /**
    * Resize scale
    */
-
   const scale = blocks[blocks.length - 1].scale;
   const position = blocks[blocks.length - 1].position;
 
@@ -226,15 +239,31 @@ export default function Level() {
     camera.position.y = smoothedCameraYRef.current;
   });
 
+  /**
+   * Change color of blocks
+   */
+  useEffect(() => {
+    if (mode === "ended") {
+      const newRandomColor = Math.random() * 100;
+      setColor(newRandomColor);
+    }
+  }, [mode]);
+
   return (
     <>
       <BlocksTower />
-      {(mode === "playing" || mode === "validating" || mode === "ended") && (
+
+      {(mode === "playing" || mode === "validating") && (
         <MovingBlock
           position={[position[0], (score + 1) * 0.5, position[2]]}
           scale={scale}
         />
       )}
+
+      {residual &&
+        residual.map((item, index) => {
+          return <ResidualBlock key={index} {...item} />;
+        })}
     </>
   );
 }
