@@ -19,6 +19,7 @@ function Interface() {
   const validating = useGameStore((state) => state.validating);
   const restart = useGameStore((state) => state.restart);
   const home = useGameStore((state) => state.home);
+  const perfectCount = useGameStore((state) => state.perfectCount);
 
   const [users, setUsers] = useState(data);
 
@@ -84,10 +85,15 @@ function Interface() {
       {mode !== "ready" && (
         <div
           onClick={handleCheckResult}
-          className="fixed flex justify-center top-0 left-0 size-full hover:cursor-pointer"
+          className="fixed flex justify-center top-0 left-0 size-full text-center hover:cursor-pointer"
         >
           <div className="absolute top-[2%] text-[8vw] text-white font-bold">
             <p>{score}</p>
+            {perfectCount > 0 && (
+              <p className="text-[2vw] font-normal tracking-widest">
+                x{perfectCount}
+              </p>
+            )}
           </div>
         </div>
       )}

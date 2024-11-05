@@ -13,24 +13,24 @@ export default function adjustBox(currentBlock, lastBlock, axis, score, color) {
     return {};
   }
 
-  if (Math.abs(difference) < 0.1) {
-    const newPosition = [...lastBlock.position];
-    newPosition[1] = (score + 1) * 0.5;
+  // if (Math.abs(difference) < 0.1) {
+  //   const newPosition = [...lastBlock.position];
+  //   newPosition[1] = (score + 1) * 0.5;
 
-    console.log("Perfect!");
+  //   console.log("Perfect!");
 
-    return {
-      newBlock: {
-        key: "instance_" + (score + 1),
-        position: newPosition,
-        scale: currentBlock.scale,
-        color: new THREE.Color(`hsl(${(score - 1) * 14 + color}, 60%, 50%)`),
-      },
-      meta: {
-        difference: 0,
-      },
-    };
-  }
+  //   return {
+  //     newBlock: {
+  //       key: "instance_" + (score + 1),
+  //       position: newPosition,
+  //       scale: currentBlock.scale,
+  //       color: new THREE.Color(`hsl(${(score - 1) * 14 + color}, 60%, 50%)`),
+  //     },
+  //     meta: {
+  //       difference: 0,
+  //     },
+  //   };
+  // }
 
   const newPosition = [...currentBlock.position];
   newPosition[axisIndex] += difference / 2;

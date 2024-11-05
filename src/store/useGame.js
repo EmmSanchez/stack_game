@@ -8,6 +8,7 @@ const INITIAL_BLOCK = {
   scale: [4, 0.5, 4],
 };
 const RANDOM_COLOR = Math.random() * 100;
+const INTIAL_PERFECT_COUNT = 0;
 const MODES = {
   READY: "ready",
   PLAYING: "playing",
@@ -30,6 +31,13 @@ export const useGameStore = create((set) => {
     residual: [],
     setResidual: (value) => {
       set({ residual: value });
+    },
+    perfectCount: INTIAL_PERFECT_COUNT,
+    increasePerfectCount: () => {
+      set((state) => ({ perfectCount: state.perfectCount + 1 }));
+    },
+    resetPerfectCount: () => {
+      set({ perfectCount: INTIAL_PERFECT_COUNT });
     },
     mode: MODES.READY,
     setScore: (value) => {
